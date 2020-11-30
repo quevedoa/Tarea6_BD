@@ -1,50 +1,72 @@
-// 1o: Variables requeridas para activar el servidor web local.
-const express = require('express');
-const servidor = express();
-const router = express.Router();    // Se usará para especificar la ruta de la pag. principal
-const path = require('path');   // Para dar dicha ruta
+/*
+Este programa hace la solicitud al servidor de node.js para que ejecute la consulta de los usuarios,
+recibe la respuesta y l;a despliega en una tabla de html
+*/
 
- // Conexion a la BD en mysql
-var mysql = require("mysql");
-var conex = mysql.createConnection({
-    host: 'localhost', user: 'usuarioBD', password: 'adminadmin', database: 'PedidosClientes'
-});
-conex.connect(function (err) {
-    if (err) {
-        console.log("Error de conexion: " + err.stack);
-        process.exit(1);
-    } else {
-        console.log("Conectado con id: " + conex.threadId);
+// 8vo: Código para mostrar los resultados y hacer la solicitud al navegador.
+let objUsusarios = {
+    // Este metodo despliega los datos de los usuarios den la pagina del navegador
+    muestraUsuarios: function (usuarios) {
+        //Agregar elementos a la tabla de usuarios.
+        //console.log("Entre usuarios");
+        tablaUsuarios = document.getElementById('tbUsuarios');
+        //Aquí colocar los valores para el encabezado de la tabla.
+
+        //Agregar los datos de la tabla.
+        usuarios.forEach(function (usuario) {
+            let renglón = document.createElement('tr');
+            let columnas = [];
+            //Crea las filas de datos de la tabla.
+            columnas.rfc = document.createElement('td');         //RFC.
+            columnas.rfc.appendChild(document.createTextNode(usuario.RFC));
+            columnas.nombre = document.createElement('td');      //Nombre.
+            columnas.nombre.appendChild(document.createTextNode(usuario.Nombre));
+            columnas.tipo = document.createElement('td');      //Nombre.
+            columnas.tipo.appendChild(document.createTextNode(usuario.Tipo));
+
+            //Las agrega a la tabla.
+            renglón.appendChild(columnas.rfc);
+            renglón.appendChild(columnas.nombre);
+            renglón.appendChild(columnas.tipo);
+            tablaUsuarios.appendChild(renglón);
+
+        })
+        //Letrero después de la tabla.
+        forma = document.getElementById("f1");
+        var enc = document.createElement("h3");
+        var textoEnc = document.createTextNode("Fin de los datos");
+        enc.appendChild(textoEnc);
+        forma.appendChild(enc);
+    },
+
+    // Controla la solicitud al servidor de node.js para que este ordene
+    // la ejecucion de los usuarios.
+    getUsuarios: function () {
+        console.log("Usuarios 1");
+        // El siguiente objeto es el que hace la solicitud al servidor.
+        // Se requiere especificar la ruta donde se encuentra este programa.
+        let xhr = new XMLHttpRequest();
+        let route = '/usuarios';
+
+        // Cuando el servidor responde y envía la respuesta completa, se
+        // dispara el siguiente evento y se ejecuta la funcion anonima.
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) { // Todos los datos se recibieron y pueden usarse.
+                if (xhr.status != 200) {    // Verifica que no haya habido error.
+                    console.error("Usuarios no leidos. Status:" + xhr.status);
+                    process.exit(1);
+                }
+                console.log("Usuarios 2");
+                //alert(xhr.responseText);
+                this.muestraUsuarios(JSON.parse(xhr.responseText));
+            }
+            console.log("Usuarios 3");
+        }.bind(this);
+        console.log("Usuarios 4");
+        xhr.open("get", route, true);
+        xhr.send();
     }
-});
+}
 
-// “Listar el nombre de los artículos que aparecen en un mínimo de cinco pedidos. 
-// Acompañarlos con la clave y la fecha de los pedidos en los cuales aparecen”.
-var query = "SELECT p.FechaPed, d.FolioP, a.Nombre \
-    from Detalle d, Articulos a, Pedidos p where d.FolioP=p.FolioP and d.IdArt=a.IdArt and d.IdArt in \
-        (select d.IdArt from Detalle d \
-        group by d.IdArt \
-        having count(d.IdArt)>=5) \
-    order by a.Nombre";
-
-// Alternativa 1
-
-res = [];
-conex.query('select * from usuarios', [], function (err, result) {
-    if (err) {
-        console.log("Error de conexion: " + err.stack); process.exit(1);
-    } else {
-        result.forEach(function (element) {
-            res.push(element)
-        });
-    }
-});
-
-
-var division = document.getElementById("respuesta");
-var tag = document.createElement("h3");
-var text = document.createTextNode(res[0].Nombre);
-tag.appendChild(text);
-division.appendChild(tag);
-
-conex.end;
+// Inicia el proceso de solicitud al servidor.
+objUsusarios.getUsuarios();
