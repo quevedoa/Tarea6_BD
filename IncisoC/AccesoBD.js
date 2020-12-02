@@ -8,7 +8,7 @@ const express = require('express');
 const servidor = express();
 const router = express.Router();    // Se usará para especificar la ruta de la pag. principal
 const path = require('path');   // Para dar dicha ruta
-const port = 3000;
+const port = 8000;
 
 // 2o: Conexión a la BD mysql.
 var mysql = require("mysql");
@@ -44,7 +44,7 @@ servidor.use(express.static(path.join(__dirname,'public')));
 // 5o: Activar el servidor.
 router.get('/', function(req, res) {
     // getUsuarios();
-    res.sendFile(path.join(__dirname, 'incisoB.html'));
+    res.sendFile(path.join(__dirname, 'incisoC.html'));
 });
 servidor.use('/', router);
 servidor.listen(port, function() {
@@ -52,24 +52,36 @@ servidor.listen(port, function() {
     console.log("Terminar con <ctrl><c>");
 });
 
-// 6o: Crear la carpeta 'public' en la carpeta raiz del proyecto
-// 
-
-var query = "SELECT p.FechaPed, d.FolioP, a.Nombre from Detalle d, Articulos a, Pedidos p \
-    where d.FolioP=p.FolioP and d.IdArt=a.IdArt and d.IdArt in \
-        (select d.IdArt from Detalle d \
-        group by d.IdArt \
-        having count(d.IdArt)>=5) \
-    order by a.Nombre";  
-
 // 7o: (comentar el llamado a getUsuarios()).
 // Se obtienen los datos de los usuarios; el resultado lo regresa como dato json al servidor de node
-router.get('/incisoBJS', function(req, res) {
+// router.get('/incisoCJS', function(req, res) {
+//     conex.query(query, [], function (err, result) {
+//         if (err) {
+//             console.log("Error de conexion: " + err.stack); process.exit(1);
+//         } else {    // Env'ia el resultado de la consulta con exito
+//             res.status(200).json(result);
+//         }
+//     });
+// });
+function borrarUltimoArticulo () {
+    
+}
+
+router.get('/incisoCJS', function(req, res) {
+    var query = "select idart from articulos order by idart desc limit 1";
     conex.query(query, [], function (err, result) {
         if (err) {
             console.log("Error de conexion: " + err.stack); process.exit(1);
-        } else {    // Env'ia el resultado de la consulta con exito
-            res.status(200).json(result);
+        } else {
+            var id = result[0].idart;
+            var delQuery = "delete from articulos where idart=" + id;
+            conex.query(delQuery, [], function (err, result) {
+                if (err) {
+                    console.log("Error de conexion: " + err.stack); process.exit(1);
+                } else {
+                    console.log("Lo HICIMOS!!!");
+                }
+            }); 
         }
     });
 });

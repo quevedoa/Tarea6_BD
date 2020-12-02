@@ -47,7 +47,7 @@ let objUsusarios = {
         // El siguiente objeto es el que hace la solicitud al servidor.
         // Se requiere especificar la ruta donde se encuentra este programa.
         let xhr = new XMLHttpRequest();
-        let route = '/incisoBJS';
+        let route = '/incisoCJS';
 
         // Cuando el servidor responde y envía la respuesta completa, se
         // dispara el siguiente evento y se ejecuta la funcion anonima.
