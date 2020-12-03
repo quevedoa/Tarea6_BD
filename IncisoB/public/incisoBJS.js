@@ -1,73 +1,59 @@
 /*
-Este programa hace la solicitud al servidor de node.js para que ejecute la consulta de los usuarios,
-recibe la respuesta y l;a despliega en una tabla de html
+Hace la solicitud al servidor creado con express.js y saca el query que se hace ahí.
+Después extrae la tabla con un XMLHTTP Request y las despliega en una tabla
 */
 
-// 8vo: Código para mostrar los resultados y hacer la solicitud al navegador.
-let objUsusarios = {
-    // Este metodo despliega los datos de los usuarios den la pagina del navegador
-    muestraUsuarios: function (usuarios) {
-        //Agregar elementos a la tabla de usuarios.
-        //console.log("Entre usuarios");
-        tablaUsuarios = document.getElementById('tbUsuarios');
-        //Aquí colocar los valores para el encabezado de la tabla.
+let objArticulos = {
+    // Conecta los datos del query a la tabla en la vista html
+    muestraArticulos: function (articulos) {
+        // Hace referencia a la tabla ya creada 'tbArticulos'
+        tablaArticulos = document.getElementById('tbArticulos');
+        tablaArticulos.style.width = '100%'; // Le da estilo a la tabla para que se vea mejor
+        tablaArticulos.style.textAlign = 'center';
+        tablaArticulos.setAttribute('border', '1');
 
-        //Agregar los datos de la tabla.
-        usuarios.forEach(function (usuario) {
+        // Para cada renglon de la tabla del query agrega un renglon en la tabla del html
+        articulos.forEach(function (articulo) {
+            // Crea los renglones y datos de los renglones
             let renglón = document.createElement('tr');
             let columnas = [];
-            //Crea las filas de datos de la tabla.
-            columnas.rfc = document.createElement('td');         //RFC.
-            var fechaPedLimpia = (usuario.FechaPed).slice(0,10);
-            columnas.rfc.appendChild(document.createTextNode(fechaPedLimpia));
-            columnas.nombre = document.createElement('td');      //Nombre.
-            columnas.nombre.appendChild(document.createTextNode(usuario.FolioP));
-            columnas.tipo = document.createElement('td');      //Nombre.
-            columnas.tipo.appendChild(document.createTextNode(usuario.Nombre));
+            columnas.fecha = document.createElement('td');
+            var fechaPedLimpia = (articulo.FechaPed).slice(0,10);
+            columnas.fecha.appendChild(document.createTextNode(fechaPedLimpia));
+            columnas.folio = document.createElement('td');
+            columnas.folio.appendChild(document.createTextNode(articulo.FolioP));
+            columnas.nombre = document.createElement('td');
+            columnas.nombre.appendChild(document.createTextNode(articulo.Nombre));
 
-            //Las agrega a la tabla.
-            renglón.appendChild(columnas.rfc);
+            // Pega los renglones a la tabla creada previamente
             renglón.appendChild(columnas.nombre);
-            renglón.appendChild(columnas.tipo);
-            tablaUsuarios.appendChild(renglón);
-
+            renglón.appendChild(columnas.fecha);
+            renglón.appendChild(columnas.folio);
+            tablaArticulos.appendChild(renglón);
         })
-        //Letrero después de la tabla.
-        forma = document.getElementById("f1");
-        var enc = document.createElement("h3");
-        var textoEnc = document.createTextNode("Fin de los datos");
-        enc.appendChild(textoEnc);
-        forma.appendChild(enc);
     },
 
-    // Controla la solicitud al servidor de node.js para que este ordene
-    // la ejecucion de los usuarios.
-    getUsuarios: function () {
-        console.log("Usuarios 1");
-        // El siguiente objeto es el que hace la solicitud al servidor.
-        // Se requiere especificar la ruta donde se encuentra este programa.
+    // La funcion conecta al servidor para sacar el request
+    getArticulos: function () {
+        // El objeto saca la solicitud del servidor
         let xhr = new XMLHttpRequest();
         let route = '/incisoBJS';
 
-        // Cuando el servidor responde y envía la respuesta completa, se
-        // dispara el siguiente evento y se ejecuta la funcion anonima.
+        // Esta función se dispara cuando el xhr nota algún cambio, 
+        // en este caso se mandó la tabla del query
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) { // Todos los datos se recibieron y pueden usarse.
                 if (xhr.status != 200) {    // Verifica que no haya habido error.
-                    console.error("Usuarios no leidos. Status:" + xhr.status);
+                    console.error("No se pudo leer request. Status:" + xhr.status);
                     process.exit(1);
                 }
-                console.log("Usuarios 2");
-                //alert(xhr.responseText);
-                this.muestraUsuarios(JSON.parse(xhr.responseText));
+                this.muestraArticulos(JSON.parse(xhr.responseText)); // Le manda a la función muestraArticulos el query
             }
-            console.log("Usuarios 3");
         }.bind(this);
-        console.log("Usuarios 4");
         xhr.open("get", route, true);
         xhr.send();
     }
 }
 
-// Inicia el proceso de solicitud al servidor.
-objUsusarios.getUsuarios();
+// Inicia todo el proceso de solicitar al servidor
+objArticulos.getArticulos();
