@@ -2,6 +2,7 @@
 Lectura de archivo de texto
 */
 
+// Esta funcion lee el archivo 
 function leerArchivo(e) {
     var archivo = e.target.files[0];
     if (!archivo) {
@@ -10,16 +11,12 @@ function leerArchivo(e) {
     var lector = new FileReader();
     lector.onload = function (e) {
         var contenido = e.target.result;
-        sessionStorage.setItem("FILE", contenido);
+        sessionStorage.setItem("FILE", contenido); // Asigna el texto contenido en el archivo en una variable de sesion
     }
     lector.readAsText(archivo);
-    window.location.href = "incisoA2.html";
+    window.location.href = "incisoA2.html"; // Redirect a la página de los botones de radio
 }
 
-function handleSubmit () {
-    const text = document.getElementById('pruebaText').value;
-    sessionStorage.setItem("TEXTO", text);
-    return;
-}
 // Inciso A
+// Espera que se cargue un archivo de texto y corre la función de leerArchivo
 document.getElementById('file-input').addEventListener('change', leerArchivo, false);

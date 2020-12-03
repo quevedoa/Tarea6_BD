@@ -1,5 +1,7 @@
 
 // Cargar archivo elegido en la ultima pagina
+// Cuando carga la ventana busca en las variables 
+// de sesión y extrae el archivo de texto
 window.addEventListener('load', () => {
     fileText = sessionStorage.getItem('FILE');
     lista = fileText.split('\n');
@@ -21,6 +23,8 @@ let accept = document.getElementById("aceptar");
 
 let division = document.getElementById("respuesta");
 
+// Esta función borra el último elemento agregado al div 
+// para dejarlo listo para el siguiente elemento 
 function borrarDiv() {
     var myNode = document.getElementById("respuesta");
     myNode.removeChild(myNode.lastChild);
@@ -93,7 +97,7 @@ function sucMenorVentas (sucursales) {
     return nomSucursal;
 }
 
-// Ordenar datos
+// Escucha y corre cuando el botón de aceptar sea oprimido
 accept.addEventListener("click", function(e) {
     e.preventDefault();
     console.log("Boton clicked");
