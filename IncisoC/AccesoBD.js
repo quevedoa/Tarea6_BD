@@ -34,7 +34,6 @@ servidor.listen(port, function() {
 
 // Activa el servidor y le manda el html de la vista.
 router.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, 'incisoC.html'));
     // Primero busca el último articulo agregado al encontrar el idart más grande
     var query = "select idart from articulos order by idart desc limit 1";
     conex.query(query, [], function (err, result) {
@@ -54,5 +53,6 @@ router.get('/', function(req, res) {
             }); 
         }
     });
+    // Manda a la vista un mensaje de éxito.
     res.send("Se ha borrado con éxito.");
 });
